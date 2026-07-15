@@ -1,142 +1,228 @@
-/* ─── Main Entry Point: Loader + God Rays + Particle Rain ───────── */
-(function () {
+/**
+ * AURUM Cafe - Main Application Logic
+ * Integrates GSAP ScrollTrigger, Custom Cursor, and UI interactions.
+ */
 
-  /* ── Loader Animation ─────────────────────────────────────────── */
-  const loaderRing = document.getElementById('loader-ring');
+document.addEventListener('DOMContentLoaded', () => {
+  // Register GSAP plugins
+  gsap.registerPlugin(ScrollTrigger);
+
+  initLoader();
+  initCursor();
+  initNav();
+  initHeroAnimations();
+  initScrollReveals();
+  initHUD();
+  initNumberCounters();
+});
+
+// ── 1. Loader ───────────────────────────────────────────────────────
+function initLoader() {
   const loader = document.getElementById('loader');
-
-  // Animate loading ring
+  const fill = document.getElementById('loader-fill');
+  
+  // Simulate loading progress
   let progress = 0;
-  const circumference = 226;
-
-  const loadInterval = setInterval(() => {
-    progress = Math.min(progress + Math.random() * 18, 100);
-    const offset = circumference - (progress / 100) * circumference;
-    if (loaderRing) loaderRing.setAttribute('stroke-dashoffset', offset);
-
-    if (progress >= 100) {
-      clearInterval(loadInterval);
+  const interval = setInterval(() => {
+    progress += Math.random() * 15;
+    if (progress > 100) progress = 100;
+    fill.style.width = `${progress}%`;
+    
+    if (progress === 100) {
+      clearInterval(interval);
       setTimeout(() => {
         loader.classList.add('hidden');
-      }, 400);
+        playHeroSequence();
+      }, 500);
     }
-  }, 80);
+  }, 100);
+}
 
-  /* ── Inject God-Ray Overlay ────────────────────────────────────── */
-  const raysContainer = document.createElement('div');
-  raysContainer.className = 'god-rays';
-  document.body.appendChild(raysContainer);
+// ── 2. Custom Cursor ────────────────────────────────────────────────
+function initCursor() {
+  const cursor = document.getElementById('cursor');
+  if (!cursor || window.matchMedia("(hover: none)").matches) return; // disable on touch
 
-  const rayPositions = [12, 22, 34, 48, 58, 68, 76];
-  const rayAngles = [-15, -8, -20, -5, -12, -18, -7];
-  const rayDurations = [4, 6, 5, 7, 4.5, 6.5, 5.5];
-
-  rayPositions.forEach((left, i) => {
-    const ray = document.createElement('div');
-    ray.className = 'ray';
-    ray.style.cssText = `
-      left: ${left}%;
-      transform: rotate(${rayAngles[i]}deg);
-      animation-duration: ${rayDurations[i]}s;
-      animation-delay: ${i * 0.4}s;
-      opacity: ${0.2 + Math.random() * 0.4};
-    `;
-    raysContainer.appendChild(ray);
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let cursorX = mouseX;
+  let cursorY = mouseY;
+  
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
   });
 
-  /* ── Particle Rain Canvas (lounge section) ─────────────────────── */
-  const particleCanvas = document.createElement('canvas');
-  particleCanvas.id = 'particle-canvas';
-  particleCanvas.width = window.innerWidth;
-  particleCanvas.height = window.innerHeight;
-  document.body.appendChild(particleCanvas);
+  const render = () => {
+    cursorX += (mouseX - cursorX) * 0.2;
+    cursorY += (mouseY - cursorY) * 0.2;
+    cursor.style.transform = `translate(${cursorX}px, ${cursorY}px)`;
+    requestAnimationFrame(render);
+  };
+  requestAnimationFrame(render);
 
-  const pCtx = particleCanvas.getContext('2d');
-  const RAIN_COUNT = 80;
+  // Add hover states to interactable elements
+  const hoverElements = document.querySelectorAll('a, button, input, select, .menu-card');
+  hoverElements.forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+  });
+}
 
-  const rainParticles = Array.from({ length: RAIN_COUNT }, () => ({
-    x: Math.random() * window.innerWidth,
-    y: Math.random() * window.innerHeight,
-    size: 1 + Math.random() * 2,
-    speed: 0.3 + Math.random() * 0.6,
-    opacity: 0.1 + Math.random() * 0.2,
-    drift: (Math.random() - 0.5) * 0.3,
-  }));
-
-  function animateParticles() {
-    pCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
-
-    rainParticles.forEach(p => {
-      p.y += p.speed;
-      p.x += p.drift;
-
-      if (p.y > particleCanvas.height) {
-        p.y = -10;
-        p.x = Math.random() * particleCanvas.width;
-      }
-      if (p.x < 0 || p.x > particleCanvas.width) {
-        p.x = Math.random() * particleCanvas.width;
-      }
-
-      pCtx.beginPath();
-      pCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      pCtx.fillStyle = `rgba(200, 150, 80, ${p.opacity})`;
-      pCtx.fill();
-    });
-
-    requestAnimationFrame(animateParticles);
-  }
-
-  animateParticles();
-
-  /* ── Window resize ─────────────────────────────────────────────── */
-  window.addEventListener('resize', () => {
-    particleCanvas.width = window.innerWidth;
-    particleCanvas.height = window.innerHeight;
-    rainParticles.forEach(p => {
-      p.x = Math.random() * window.innerWidth;
-      p.y = Math.random() * window.innerHeight;
-    });
+// ── 3. Navigation ───────────────────────────────────────────────────
+function initNav() {
+  const navbar = document.getElementById('navbar');
+  
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      navbar.classList.add('scrolled');
+    } else {
+      navbar.classList.remove('scrolled');
+    }
   });
 
-  /* ── Add to Order micro-interaction ───────────────────────────── */
-  const addBtn = document.getElementById('btn-add-cart');
-  if (addBtn) {
-    addBtn.addEventListener('click', () => {
-      const orig = addBtn.textContent;
-      gsap.to(addBtn, { scale: 0.96, duration: 0.1, yoyo: true, repeat: 1 });
-      addBtn.textContent = '✓ Added to Order';
-      addBtn.style.background = 'hsl(140, 50%, 40%)';
-      setTimeout(() => {
-        addBtn.textContent = orig;
-        addBtn.style.background = '';
-      }, 2000);
-    });
-  }
-
-  /* ── Smooth anchor scroll ──────────────────────────────────────── */
+  // Smooth scroll for anchor links
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', (e) => {
-      const target = document.querySelector(anchor.getAttribute('href'));
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href');
+      if(targetId === '#') return;
+      const targetEl = document.querySelector(targetId);
+      if(targetEl) {
+        window.scrollTo({
+          top: targetEl.offsetTop,
+          behavior: 'smooth'
+        });
       }
     });
   });
+}
 
-  /* ── Hover labels for nav links ────────────────────────────────── */
-  document.querySelectorAll('.nav-links a').forEach(a => {
-    a.dataset.cursorLabel = a.textContent;
+// ── 4. Hero Animations ──────────────────────────────────────────────
+function playHeroSequence() {
+  const tl = gsap.timeline();
+  
+  tl.to('.hero-tag', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' })
+    .to('.hero-headline .line', { 
+      opacity: 1, 
+      y: 0, 
+      duration: 1, 
+      stagger: 0.2, 
+      ease: 'power3.out' 
+    }, "-=0.4")
+    .to('.hero-sub', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, "-=0.6")
+    .to('.hero-actions', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, "-=0.6")
+    .to('.scroll-cue', { opacity: 1, duration: 1 }, "-=0.2")
+    .to('#hero-hud', { opacity: 1, x: 0, duration: 1, ease: 'power2.out' }, "-=0.5");
+}
+
+function initHeroAnimations() {
+  // Parallax effect on hero background video wrapper
+  gsap.to('#hero-video-wrap', {
+    yPercent: 30,
+    ease: "none",
+    scrollTrigger: {
+      trigger: "#hero",
+      start: "top top",
+      end: "bottom top",
+      scrub: true
+    }
   });
+}
 
-  console.log(
-    '%cAURUM Coffee',
-    'color: #c89650; font-size: 24px; font-family: Georgia, serif; font-weight: bold;'
-  );
-  console.log(
-    '%cBuilt with Three.js · GSAP · Canvas API',
-    'color: #7a5a2a; font-size: 12px;'
-  );
+// ── 5. Scroll Reveals ───────────────────────────────────────────────
+function initScrollReveals() {
+  const revealElements = document.querySelectorAll('.reveal-el');
+  
+  revealElements.forEach(el => {
+    gsap.to(el, {
+      opacity: 1,
+      y: 0,
+      duration: 1,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: el,
+        start: "top 85%", // trigger when top of element is 85% down the viewport
+        toggleActions: "play none none reverse"
+      }
+    });
+  });
+}
 
-})();
+// ── 6. HUD Cycling ──────────────────────────────────────────────────
+function initHUD() {
+  const roasts = ["Yirgacheffe Natural", "Kenya AA Washed", "Brazil Cerrado", "Colombia Supremo"];
+  const roastEl = document.getElementById('hud-roast');
+  let i = 0;
+  
+  if(roastEl) {
+    setInterval(() => {
+      i = (i + 1) % roasts.length;
+      roastEl.style.opacity = 0;
+      setTimeout(() => {
+        roastEl.textContent = roasts[i];
+        roastEl.style.opacity = 1;
+      }, 300);
+    }, 4000);
+  }
+}
+
+// ── 7. Number Counters ──────────────────────────────────────────────
+function initNumberCounters() {
+  const stats = document.querySelectorAll('.stat-n');
+  
+  stats.forEach(stat => {
+    const target = parseInt(stat.getAttribute('data-target'));
+    
+    ScrollTrigger.create({
+      trigger: stat,
+      start: "top 85%",
+      once: true,
+      onEnter: () => {
+        gsap.to(stat, {
+          innerHTML: target,
+          duration: 2,
+          ease: "power2.out",
+          snap: { innerHTML: 1 },
+          onUpdate: function() {
+            stat.innerHTML = Math.round(this.targets()[0].innerHTML);
+          }
+        });
+      }
+    });
+  });
+}
+
+// ── 8. Form Handling ────────────────────────────────────────────────
+window.handleRes = function(e) {
+  e.preventDefault();
+  const form = document.getElementById('res-form');
+  const success = document.getElementById('res-success');
+  const btn = document.getElementById('btn-confirm');
+  
+  btn.textContent = "Processing...";
+  btn.style.opacity = 0.5;
+  
+  setTimeout(() => {
+    form.style.display = 'none';
+    success.removeAttribute('hidden');
+    
+    gsap.fromTo(success, 
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
+    );
+  }, 1000);
+};
+
+// Stepper logic
+document.addEventListener('DOMContentLoaded', () => {
+  const gMinus = document.getElementById('g-minus');
+  const gPlus = document.getElementById('g-plus');
+  const gCount = document.getElementById('g-count');
+  
+  if(gMinus && gPlus && gCount) {
+    let count = 2;
+    gMinus.addEventListener('click', () => { if(count > 1) gCount.textContent = --count; });
+    gPlus.addEventListener('click', () => { if(count < 8) gCount.textContent = ++count; });
+  }
+});

@@ -4,17 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AURUM — Specialty Coffee Experience</title>
-  <meta name="description" content="AURUM is a boundary-pushing specialty coffee brand. Explore our immersive 3D cafe, trace your coffee from origin farm to cup, and discover roasts crafted for the discerning palate." />
-  <meta property="og:title" content="AURUM — Specialty Coffee Experience" />
-  <meta property="og:description" content="An immersive 3D virtual coffee experience. Farm to cup, told cinematically." />
+  <meta name="description" content="AURUM is a boundary-pushing specialty coffee brand. An immersive 3D cafe experience — from farm to cup, told cinematically." />
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet" />
 
-  <!-- Three.js & GSAP from CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 
@@ -26,277 +21,469 @@
   <div id="cursor" aria-hidden="true">
     <div class="cursor-ring"></div>
     <div class="cursor-dot"></div>
-    <div class="cursor-label"></div>
   </div>
 
   <!-- Loader -->
   <div id="loader">
-    <div class="loader-content">
-      <svg class="loader-logo" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="40" cy="40" r="36" stroke="rgba(200,150,80,0.3)" stroke-width="1"/>
-        <circle id="loader-ring" cx="40" cy="40" r="36" stroke="#C89650" stroke-width="1.5" stroke-dasharray="226" stroke-dashoffset="226" stroke-linecap="round"/>
-        <text x="50%" y="54%" text-anchor="middle" fill="#C89650" font-family="Cormorant Garamond" font-size="11" letter-spacing="4">A</text>
-      </svg>
-      <p class="loader-text">Preparing your experience</p>
+    <div class="loader-inner">
+      <div class="loader-logo">A</div>
+      <div class="loader-bar"><div class="loader-fill" id="loader-fill"></div></div>
+      <p class="loader-text">Brewing your experience…</p>
     </div>
   </div>
 
   <!-- Navigation -->
-  <nav id="navbar" aria-label="Main navigation">
-    <a href="#hero" class="nav-logo" id="nav-logo">AURUM</a>
-    <ul class="nav-links" role="list">
-      <li><a href="#origins" id="nav-origins">Origins</a></li>
-      <li><a href="#menu" id="nav-menu">Menu</a></li>
-      <li><a href="#lounge" id="nav-lounge">The Lounge</a></li>
+  <nav id="navbar">
+    <a href="#hero" class="nav-logo">AURUM</a>
+    <ul class="nav-links">
+      <li><a href="#experience">The Room</a></li>
+      <li><a href="#cinematic">Cinematic</a></li>
+      <li><a href="#origins">Origins</a></li>
+      <li><a href="#menu">Menu</a></li>
     </ul>
-    <a href="#lounge" class="nav-cta" id="nav-cta">Reserve a Table</a>
+    <a href="#reserve" class="nav-cta">Reserve a Table</a>
   </nav>
 
-  <!-- Main 3D Canvas (full-page, fixed) -->
-  <canvas id="three-canvas" aria-label="Interactive 3D cafe environment"></canvas>
+  <!-- ═══════════════════════════════════════════
+       SECTION 1 — HERO (YouTube Video BG)
+  ════════════════════════════════════════════ -->
+  <section id="hero" class="section-hero">
 
-  <!-- ─── SECTION 1: HERO ─────────────────────────────────────────── -->
-  <section id="hero" class="scene-section">
+    <!-- Full-screen YouTube video background -->
+    <div class="video-bg-wrap" id="hero-video-wrap">
+      <iframe
+        id="hero-video"
+        src="https://www.youtube.com/embed/U7mPqycQ0tQ?autoplay=1&mute=1&loop=1&playlist=U7mPqycQ0tQ&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&enablejsapi=1&vq=hd1080"
+        title="Coffee cafe ambiance background video"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
+      ></iframe>
+      <div class="video-overlay"></div>
+    </div>
+
     <div class="hero-content">
-      <div class="hero-tag" id="hero-tag">Est. 2019 · Specialty Coffee</div>
-      <h1 class="hero-headline" id="hero-headline">
-        <span class="line">Where the</span>
-        <span class="line italic">Bean Becomes</span>
-        <span class="line">Ceremony.</span>
+      <div class="hero-tag" id="hero-tag">Est. 2019 · Brooklyn, New York</div>
+      <h1 class="hero-headline">
+        <span class="line" id="h-line-1">Where the</span>
+        <span class="line italic" id="h-line-2">Bean Becomes</span>
+        <span class="line" id="h-line-3">Ceremony.</span>
       </h1>
-      <p class="hero-sub" id="hero-sub">
-        Single-origin. Slow-roasted. Served with intention.
-      </p>
+      <p class="hero-sub" id="hero-sub">Single-origin. Slow-roasted. Served with intention.</p>
       <div class="hero-actions" id="hero-actions">
-        <a href="#menu" class="btn-primary" id="btn-explore">Explore the Menu</a>
-        <a href="#origins" class="btn-ghost" id="btn-journey">Trace the Journey</a>
+        <a href="#experience" class="btn-primary" id="btn-enter">Enter the Space</a>
+        <a href="#cinematic" class="btn-ghost" id="btn-watch">Watch the Film</a>
       </div>
     </div>
 
-    <!-- Live Origin HUD -->
-    <div class="origin-hud glass-panel" id="origin-hud" role="complementary" aria-label="Live origin data">
-      <div class="hud-row">
-        <span class="hud-label">Current Origin</span>
-        <span class="hud-value" id="hud-origin">Yirgacheffe, ETH</span>
+    <!-- Live HUD -->
+    <div class="hud glass-panel" id="hero-hud">
+      <div class="hud-item">
+        <span class="hud-label">Current Roast</span>
+        <span class="hud-val cycling" id="hud-roast">Yirgacheffe Natural</span>
       </div>
       <div class="hud-divider"></div>
-      <div class="hud-row">
+      <div class="hud-item">
         <span class="hud-label">Altitude</span>
-        <span class="hud-value"><span class="counter" data-target="1950">0</span> m</span>
+        <span class="hud-val">1,950 m</span>
       </div>
-      <div class="hud-row">
-        <span class="hud-label">Roast Date</span>
-        <span class="hud-value" id="hud-date">Today</span>
-      </div>
-      <div class="hud-row">
+      <div class="hud-item">
         <span class="hud-label">Brew Temp</span>
-        <span class="hud-value"><span class="counter" data-target="93">0</span>°C</span>
+        <span class="hud-val">93°C</span>
       </div>
-      <div class="hud-pulse" aria-label="Live data indicator">
-        <span class="pulse-dot"></span>
-        <span class="pulse-label">Live</span>
+      <div class="hud-live">
+        <span class="live-dot"></span>
+        <span>Live Roasting</span>
       </div>
     </div>
 
-    <!-- Scroll indicator -->
-    <div class="scroll-indicator" id="scroll-indicator" aria-label="Scroll to explore">
-      <span class="scroll-text">Scroll</span>
-      <div class="scroll-line"></div>
+    <div class="scroll-cue" id="scroll-cue">
+      <span>Scroll</span>
+      <div class="scroll-line-anim"></div>
     </div>
   </section>
 
-  <!-- ─── SECTION 2: ORIGINS / PROVENANCE MAP ─────────────────────── -->
-  <section id="origins" class="scene-section origins-section">
-    <div class="origins-content">
+  <!-- ═══════════════════════════════════════════
+       SECTION 2 — 3D ROOM (Sketchfab Embed)
+  ════════════════════════════════════════════ -->
+  <section id="experience" class="section-room">
+    <div class="room-header">
+      <div class="eyebrow reveal-el">The Space</div>
+      <h2 class="section-h reveal-el">Explore Our Cafe<br/><em>in Full 3D</em></h2>
+      <p class="section-p reveal-el">Orbit, pan, and zoom through our real cafe environment — every surface, every seat, every corner rendered in photorealistic detail.</p>
+    </div>
+
+    <div class="sketchfab-container reveal-el">
+      <div class="sketchfab-badge glass-panel">
+        <span>⟳ Drag to orbit</span>
+        <span class="badge-divider">·</span>
+        <span>Scroll to zoom</span>
+        <span class="badge-divider">·</span>
+        <span>Right-click to pan</span>
+      </div>
+      <!-- Sketchfab: "Coffee Shop" - high quality free 3D cafe interior model -->
+      <iframe
+        id="sketchfab-frame"
+        title="AURUM Coffee Shop — Interactive 3D Environment"
+        class="sketchfab-iframe"
+        frameborder="0"
+        allowfullscreen
+        mozallowfullscreen="true"
+        webkitallowfullscreen="true"
+        allow="autoplay; fullscreen; xr-spatial-tracking"
+        xr-spatial-tracking
+        execution-while-out-of-viewport
+        execution-while-not-rendered
+        web-share
+        src="https://sketchfab.com/models/2c67b37efae1484a855b98a35eb5d64e/embed?autostart=1&ui_infos=0&ui_watermark_link=0&ui_watermark=0&preload=1&ui_hint=0&dnt=1"
+      ></iframe>
+      <div class="sketchfab-credit">3D Model via Sketchfab · CC Attribution</div>
+    </div>
+
+    <!-- Real cafe photo strips alongside -->
+    <div class="room-photos reveal-el">
+      <div class="room-photo-item">
+        <img
+          src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&q=85&auto=format&fit=crop"
+          alt="Warm cafe interior with wooden furniture and ambient lighting"
+          loading="lazy"
+        />
+        <div class="photo-caption">The Main Hall</div>
+      </div>
+      <div class="room-photo-item">
+        <img
+          src="https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=600&q=85&auto=format&fit=crop"
+          alt="Espresso bar with professional equipment and barista at work"
+          loading="lazy"
+        />
+        <div class="photo-caption">The Brew Bar</div>
+      </div>
+      <div class="room-photo-item">
+        <img
+          src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=85&auto=format&fit=crop"
+          alt="Cozy lounge corner with leather armchairs"
+          loading="lazy"
+        />
+        <div class="photo-caption">The Lounge Corner</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 3 — CINEMATIC FILM (YouTube Videos)
+  ════════════════════════════════════════════ -->
+  <section id="cinematic" class="section-cinematic">
+    <div class="cinematic-header">
+      <div class="eyebrow reveal-el">The Film</div>
+      <h2 class="section-h centered reveal-el">A Coffee in<br/><em>Three Acts.</em></h2>
+    </div>
+
+    <div class="film-grid">
+
+      <!-- Act 1: The Roast -->
+      <div class="film-card reveal-el" id="film-card-1">
+        <div class="film-video-wrap">
+          <iframe
+            src="https://www.youtube.com/embed/4Fg6GGHpbqI?autoplay=1&mute=1&loop=1&playlist=4Fg6GGHpbqI&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1"
+            title="Coffee roasting process – Act 1: The Roast"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
+            allowfullscreen
+          ></iframe>
+          <div class="film-overlay"></div>
+        </div>
+        <div class="film-info glass-panel">
+          <span class="film-act">Act I</span>
+          <h3>The Roast</h3>
+          <p>Green beans arrive from elevation. Each batch is slow-roasted to the exact second of optimal caramelization.</p>
+        </div>
+      </div>
+
+      <!-- Act 2: The Pour -->
+      <div class="film-card reveal-el tall" id="film-card-2">
+        <div class="film-video-wrap">
+          <iframe
+            src="https://www.youtube.com/embed/st571DYYTR8?autoplay=1&mute=1&loop=1&playlist=st571DYYTR8&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1"
+            title="Pour over coffee brewing – Act 2: The Pour"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
+            allowfullscreen
+          ></iframe>
+          <div class="film-overlay"></div>
+        </div>
+        <div class="film-info glass-panel">
+          <span class="film-act">Act II</span>
+          <h3>The Pour</h3>
+          <p>Water at 93°C, poured in concentric spirals. The bloom. The extraction. The patience required for a perfect cup.</p>
+        </div>
+      </div>
+
+      <!-- Act 3: The Moment -->
+      <div class="film-card reveal-el" id="film-card-3">
+        <div class="film-video-wrap">
+          <iframe
+            src="https://www.youtube.com/embed/6EJiqKr3oF4?autoplay=1&mute=1&loop=1&playlist=6EJiqKr3oF4&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1"
+            title="Cafe ambiance and latte art – Act 3: The Moment"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
+            allowfullscreen
+          ></iframe>
+          <div class="film-overlay"></div>
+        </div>
+        <div class="film-info glass-panel">
+          <span class="film-act">Act III</span>
+          <h3>The Moment</h3>
+          <p>The cup arrives. Steam curls. Time slows. This is what we work toward — your moment of pause.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 4 — ORIGINS / PROVENANCE
+  ════════════════════════════════════════════ -->
+  <section id="origins" class="section-origins">
+    <div class="origins-inner">
+
       <div class="origins-left">
-        <div class="section-eyebrow" id="origins-eyebrow">The Journey</div>
-        <h2 class="section-headline" id="origins-headline">
-          From Volcanic<br/>
-          <em>Soil</em> to<br/>
-          Your Cup.
-        </h2>
-        <p class="section-body" id="origins-body">
-          Every AURUM blend begins at elevation — hand-picked by farmers who've cultivated the same terroir for generations. We partner directly, paying 40% above market rate.
-        </p>
-        <div class="origin-stats" id="origin-stats">
-          <div class="stat-item">
-            <span class="stat-num"><span class="counter" data-target="12">0</span></span>
-            <span class="stat-label">Origin Countries</span>
+        <div class="eyebrow reveal-el">The Journey</div>
+        <h2 class="section-h reveal-el">From Volcanic<br/><em>Soil</em> to<br/>Your Cup.</h2>
+        <p class="section-p reveal-el">Every AURUM blend begins where coffee belongs — at elevation. We partner directly with farmers, paying 40% above market rate, tracing every bean to its origin.</p>
+
+        <div class="origin-stats reveal-el">
+          <div class="stat"><span class="stat-n" data-target="12">0</span><span class="stat-l">Countries</span></div>
+          <div class="stat"><span class="stat-n" data-target="47">0</span><span class="stat-l">Farm Partners</span></div>
+          <div class="stat"><span class="stat-n" data-target="98">0</span><span class="stat-l">% Direct Trade</span></div>
+        </div>
+
+        <div class="origin-cards reveal-el">
+          <div class="origin-card glass-panel">
+            <img src="https://images.unsplash.com/photo-1523920290228-4f321a939b4c?w=80&h=80&q=80&auto=format&fit=crop" alt="Ethiopian coffee farm" />
+            <div>
+              <strong>🇪🇹 Ethiopia · Yirgacheffe</strong>
+              <span>1,950m · Natural Process · Heirloom Varietals</span>
+            </div>
           </div>
-          <div class="stat-item">
-            <span class="stat-num"><span class="counter" data-target="47">0</span></span>
-            <span class="stat-label">Farm Partners</span>
+          <div class="origin-card glass-panel">
+            <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=80&h=80&q=80&auto=format&fit=crop" alt="Kenya coffee plantation" />
+            <div>
+              <strong>🇰🇪 Kenya · Mount Kenya</strong>
+              <span>1,700m · Washed Process · SL-28 Varietal</span>
+            </div>
           </div>
-          <div class="stat-item">
-            <span class="stat-num"><span class="counter" data-target="98">0</span></span>
-            <span class="stat-label">% Direct Trade</span>
+          <div class="origin-card glass-panel">
+            <img src="https://images.unsplash.com/photo-1611854779393-1b2da9d400fe?w=80&h=80&q=80&auto=format&fit=crop" alt="Brazilian coffee farm" />
+            <div>
+              <strong>🇧🇷 Brazil · Cerrado</strong>
+              <span>1,100m · Pulped Natural · Yellow Bourbon</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="origins-right">
-        <!-- Provenance map canvas -->
-        <canvas id="map-canvas" width="600" height="400" aria-label="Global coffee origin map"></canvas>
-        <div class="origin-cards" id="origin-cards">
-          <div class="origin-card glass-panel" data-lat="8" data-lon="39">
-            <div class="origin-flag">🇪🇹</div>
-            <div class="origin-info">
-              <strong>Ethiopia · Yirgacheffe</strong>
-              <span>1,950m · Natural Process</span>
-            </div>
+      <div class="origins-right reveal-el">
+        <div class="farm-photos">
+          <img
+            class="farm-photo main"
+            src="https://images.unsplash.com/photo-1511537190424-bbbab87ac5eb?w=700&q=85&auto=format&fit=crop"
+            alt="Coffee farmer picking ripe red cherries in Ethiopian highland"
+          />
+          <img
+            class="farm-photo small top"
+            src="https://images.unsplash.com/photo-1599639957043-f3aa5c986398?w=350&q=80&auto=format&fit=crop"
+            alt="Close up of ripe coffee cherries on branch"
+          />
+          <img
+            class="farm-photo small bottom"
+            src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=350&q=80&auto=format&fit=crop"
+            alt="Coffee drying on raised beds in the sun"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 5 — MENU (Real Photography)
+  ════════════════════════════════════════════ -->
+  <section id="menu" class="section-menu">
+    <div class="menu-header">
+      <div class="eyebrow reveal-el">The Menu</div>
+      <h2 class="section-h centered reveal-el">Crafted for the<br/><em>Discerning</em> Palate.</h2>
+    </div>
+
+    <div class="menu-grid">
+
+      <div class="menu-card reveal-el" id="mc-1">
+        <div class="menu-img-wrap">
+          <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=600&q=85&auto=format&fit=crop" alt="Single shot espresso in white ceramic cup" />
+          <div class="menu-img-overlay">
+            <span class="menu-hover-label">Explore</span>
           </div>
-          <div class="origin-card glass-panel" data-lat="-1.3" data-lon="36.8">
-            <div class="origin-flag">🇰🇪</div>
-            <div class="origin-info">
-              <strong>Kenya · Mount Kenya</strong>
-              <span>1,700m · Washed Process</span>
-            </div>
+        </div>
+        <div class="menu-card-body">
+          <h3>Espresso Classico</h3>
+          <p>Double ristretto, 18g Yirgacheffe Natural · Notes of dark chocolate, molasses, and dried fig.</p>
+          <div class="menu-footer">
+            <span class="price">$5</span>
+            <span class="notes-pills"><span>Chocolate</span><span>Molasses</span><span>Fig</span></span>
           </div>
-          <div class="origin-card glass-panel" data-lat="-3" data-lon="-60">
-            <div class="origin-flag">🇧🇷</div>
-            <div class="origin-info">
-              <strong>Brazil · Cerrado</strong>
-              <span>1,100m · Pulped Natural</span>
-            </div>
+        </div>
+      </div>
+
+      <div class="menu-card reveal-el" id="mc-2">
+        <div class="menu-img-wrap">
+          <img src="https://images.unsplash.com/photo-1541167760496-1628856ab772?w=600&q=85&auto=format&fit=crop" alt="Latte art in a ceramic cup with leaf pattern" />
+          <div class="menu-img-overlay">
+            <span class="menu-hover-label">Explore</span>
+          </div>
+        </div>
+        <div class="menu-card-body">
+          <h3>Flat White</h3>
+          <p>Kenya AA espresso, micro-foamed whole milk. Silky, dense, with a clean bright finish.</p>
+          <div class="menu-footer">
+            <span class="price">$7</span>
+            <span class="notes-pills"><span>Blackcurrant</span><span>Cedar</span><span>Milk</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-card reveal-el" id="mc-3">
+        <div class="menu-img-wrap">
+          <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=85&auto=format&fit=crop" alt="Pour over coffee in glass dripper with steam rising" />
+          <div class="menu-img-overlay">
+            <span class="menu-hover-label">Explore</span>
+          </div>
+        </div>
+        <div class="menu-card-body">
+          <h3>Pour Over</h3>
+          <p>V60 brewed to order with our rotating single-origins. 4-minute extraction, ground to order.</p>
+          <div class="menu-footer">
+            <span class="price">$9</span>
+            <span class="notes-pills"><span>Floral</span><span>Citrus</span><span>Honey</span></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-card reveal-el" id="mc-4">
+        <div class="menu-img-wrap">
+          <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&q=85&auto=format&fit=crop" alt="Cold brew coffee in glass with ice cubes" />
+          <div class="menu-img-overlay">
+            <span class="menu-hover-label">Explore</span>
+          </div>
+        </div>
+        <div class="menu-card-body">
+          <h3>Cold Brew</h3>
+          <p>Brazil Cerrado steeped 20 hours at 4°C. Served over crystal ice — smooth, low-acid, addictive.</p>
+          <div class="menu-footer">
+            <span class="price">$8</span>
+            <span class="notes-pills"><span>Caramel</span><span>Hazelnut</span><span>Cacao</span></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Coffee bags product display -->
+    <div class="bags-section reveal-el">
+      <h3 class="bags-title">Take it Home</h3>
+      <div class="bags-grid">
+        <div class="bag-card glass-panel">
+          <img src="https://images.unsplash.com/photo-1610889556528-9a770e32642f?w=400&q=80&auto=format&fit=crop" alt="Premium coffee bag Yirgacheffe single origin" />
+          <div class="bag-info">
+            <strong>Yirgacheffe Natural</strong>
+            <span>250g · Light Roast</span>
+            <span class="bag-price">$24</span>
+          </div>
+        </div>
+        <div class="bag-card glass-panel">
+          <img src="https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400&q=80&auto=format&fit=crop" alt="Kenya AA premium coffee bag" />
+          <div class="bag-info">
+            <strong>Kenya AA</strong>
+            <span>250g · Medium Roast</span>
+            <span class="bag-price">$28</span>
+          </div>
+        </div>
+        <div class="bag-card glass-panel">
+          <img src="https://images.unsplash.com/photo-1587734195342-ba1789fd2a83?w=400&q=80&auto=format&fit=crop" alt="House blend signature coffee bag" />
+          <div class="bag-info">
+            <strong>House Blend</strong>
+            <span>250g · Medium-Dark</span>
+            <span class="bag-price">$18</span>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ─── SECTION 3: MENU / 3D PRODUCT ────────────────────────────── -->
-  <section id="menu" class="scene-section menu-section">
-    <div class="menu-content">
-      <div class="menu-header">
-        <div class="section-eyebrow" id="menu-eyebrow">The Menu</div>
-        <h2 class="section-headline centered" id="menu-headline">
-          Crafted for the<br/><em>Discerning</em> Palate.
-        </h2>
-      </div>
+  <!-- ═══════════════════════════════════════════
+       SECTION 6 — RESERVE (Video BG + Form)
+  ════════════════════════════════════════════ -->
+  <section id="reserve" class="section-reserve">
 
-      <div class="product-showcase" id="product-showcase">
-        <!-- 3D Product Canvas -->
-        <div class="product-3d-wrap" id="product-3d-wrap">
-          <canvas id="product-canvas" aria-label="Interactive 3D coffee bag – drag to rotate"></canvas>
-          <div class="drag-hint" id="drag-hint">
-            <span>⟳ Drag to rotate</span>
-          </div>
-        </div>
-
-        <!-- Product Info -->
-        <div class="product-info-panel glass-panel" id="product-info-panel">
-          <div class="product-selector" id="product-selector">
-            <button class="prod-tab active" data-product="0" id="tab-yirg">Yirgacheffe</button>
-            <button class="prod-tab" data-product="1" id="tab-kenya">Kenya AA</button>
-            <button class="prod-tab" data-product="2" id="tab-blend">House Blend</button>
-          </div>
-          <div class="product-details" id="product-details">
-            <h3 class="product-name" id="product-name">Yirgacheffe Natural</h3>
-            <p class="product-origin" id="product-origin">Ethiopia · 1,950m Altitude</p>
-            <p class="product-notes-label">Tasting Notes</p>
-            <div class="product-notes" id="product-notes">
-              <span class="note-tag">Blueberry</span>
-              <span class="note-tag">Jasmine</span>
-              <span class="note-tag">Dark Chocolate</span>
-            </div>
-            <div class="roast-profile" id="roast-profile">
-              <div class="roast-label">Roast Profile</div>
-              <div class="roast-bar-wrap">
-                <div class="roast-bar">
-                  <div class="roast-fill" id="roast-fill" style="width: 35%"></div>
-                </div>
-                <div class="roast-ends">
-                  <span>Light</span>
-                  <span>Dark</span>
-                </div>
-              </div>
-            </div>
-            <div class="product-price" id="product-price">$24 / 250g</div>
-            <button class="btn-primary full-width" id="btn-add-cart">Add to Order</button>
-          </div>
-        </div>
-      </div>
+    <!-- Video background -->
+    <div class="reserve-video-bg">
+      <iframe
+        src="https://www.youtube.com/embed/3GwjfUFyY6M?autoplay=1&mute=1&loop=1&playlist=3GwjfUFyY6M&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1"
+        title="Warm cafe lounge ambiance video"
+        frameborder="0"
+        allow="autoplay; encrypted-media"
+        allowfullscreen
+      ></iframe>
+      <div class="video-overlay dark"></div>
     </div>
-  </section>
 
-  <!-- ─── SECTION 4: LOUNGE / CTA ─────────────────────────────────── -->
-  <section id="lounge" class="scene-section lounge-section">
-    <div class="lounge-content">
-      <div class="lounge-header">
-        <div class="section-eyebrow" id="lounge-eyebrow">The Lounge</div>
-        <h2 class="section-headline" id="lounge-headline">
-          Stay a While.<br/>
-          <em>The world can wait.</em>
-        </h2>
-      </div>
-
-      <div class="lounge-grid" id="lounge-grid">
-        <!-- Reservation panel -->
-        <div class="reservation-panel glass-panel" id="reservation-panel">
-          <h3>Reserve Your Seat</h3>
-          <form class="reservation-form" id="reservation-form" onsubmit="handleReservation(event)">
-            <div class="form-group">
-              <label for="res-name">Name</label>
-              <input type="text" id="res-name" placeholder="Your name" autocomplete="name" />
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="res-date">Date</label>
-                <input type="date" id="res-date" />
-              </div>
-              <div class="form-group">
-                <label for="res-time">Time</label>
-                <select id="res-time">
-                  <option>08:00</option>
-                  <option>10:00</option>
-                  <option>12:00</option>
-                  <option>14:00</option>
-                  <option>16:00</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="res-guests">Guests</label>
-              <div class="guest-stepper">
-                <button type="button" id="guest-minus" aria-label="Decrease guests">−</button>
-                <span id="guest-count">2</span>
-                <button type="button" id="guest-plus" aria-label="Increase guests">+</button>
-              </div>
-            </div>
-            <button type="submit" class="btn-primary full-width" id="btn-reserve">Confirm Reservation</button>
-          </form>
-          <div class="reservation-success" id="reservation-success" hidden>
-            <div class="success-icon">✓</div>
-            <p>Your table is reserved. We'll see you soon.</p>
+    <div class="reserve-content">
+      <div class="reserve-left">
+        <div class="eyebrow">The Lounge</div>
+        <h2 class="section-h">Stay a While.<br/><em>The world can wait.</em></h2>
+        <div class="lounge-details">
+          <div class="detail-block glass-panel">
+            <span class="detail-icon">◷</span>
+            <div><strong>Hours</strong><p>Mon–Fri 7am–9pm<br/>Sat–Sun 8am–10pm</p></div>
+          </div>
+          <div class="detail-block glass-panel">
+            <span class="detail-icon">⌖</span>
+            <div><strong>Location</strong><p>12 Foundry Lane<br/>Brooklyn, NY 11201</p></div>
           </div>
         </div>
+      </div>
 
-        <!-- Ambient info -->
-        <div class="lounge-info" id="lounge-info">
-          <div class="info-block glass-panel">
-            <div class="info-icon">◷</div>
-            <div>
-              <strong>Hours</strong>
-              <p>Mon–Fri: 7am – 9pm</p>
-              <p>Sat–Sun: 8am – 10pm</p>
+      <div class="reservation-panel glass-panel" id="reservation-panel">
+        <h3>Reserve Your Seat</h3>
+        <form id="res-form" onsubmit="handleRes(event)">
+          <div class="form-group">
+            <label for="r-name">Name</label>
+            <input type="text" id="r-name" placeholder="Your name" autocomplete="name" required />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="r-date">Date</label>
+              <input type="date" id="r-date" required />
+            </div>
+            <div class="form-group">
+              <label for="r-time">Time</label>
+              <select id="r-time">
+                <option>08:00</option><option>10:00</option>
+                <option>12:00</option><option>14:00</option>
+                <option>16:00</option><option>18:00</option>
+              </select>
             </div>
           </div>
-          <div class="info-block glass-panel">
-            <div class="info-icon">⌖</div>
-            <div>
-              <strong>Location</strong>
-              <p>12 Foundry Lane</p>
-              <p>Brooklyn, NY 11201</p>
+          <div class="form-group">
+            <label>Guests</label>
+            <div class="stepper">
+              <button type="button" id="g-minus">−</button>
+              <span id="g-count">2</span>
+              <button type="button" id="g-plus">+</button>
             </div>
           </div>
-          <div class="info-block glass-panel">
-            <div class="info-icon">◈</div>
-            <div>
-              <strong>Wi-Fi</strong>
-              <p>High-speed available</p>
-              <p>Ask barista for key</p>
-            </div>
-          </div>
+          <button type="submit" class="btn-primary full-w" id="btn-confirm">Confirm Reservation</button>
+        </form>
+        <div class="res-success" id="res-success" hidden>
+          <div class="success-check">✓</div>
+          <p>Your table is reserved.<br/>We'll see you soon.</p>
         </div>
       </div>
     </div>
@@ -309,23 +496,17 @@
         <span class="footer-logo">AURUM</span>
         <p>Specialty coffee for the intentional mind.</p>
       </div>
-      <nav class="footer-nav" aria-label="Footer navigation">
+      <nav class="footer-nav">
         <a href="#hero">Home</a>
+        <a href="#experience">The Room</a>
         <a href="#origins">Origins</a>
         <a href="#menu">Menu</a>
-        <a href="#lounge">Lounge</a>
+        <a href="#reserve">Reserve</a>
       </nav>
-      <p class="footer-copy">© 2026 AURUM Coffee. All rights reserved.</p>
+      <p class="footer-copy">© 2026 AURUM Coffee, Brooklyn NY. All rights reserved.</p>
     </div>
   </footer>
 
-  <!-- Scripts -->
-  <script src="js/cursor.js"></script>
-  <script src="js/scene.js"></script>
-  <script src="js/product.js"></script>
-  <script src="js/map.js"></script>
-  <script src="js/scroll.js"></script>
-  <script src="js/ui.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
